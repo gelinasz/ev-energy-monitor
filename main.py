@@ -1,14 +1,10 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-
 from pydantic import BaseModel, ConfigDict, Field
-
 from sqlalchemy.orm import Session
-
+from sqlalchemy import text
 from datetime import datetime
-
 from database import get_db, Base, engine
-
 from models import Sensor as SensorModel
 
 Base.metadata.create_all(bind=engine)
@@ -51,7 +47,6 @@ class SensorOut(BaseModel):
 def root():
     return {"message": "EV energy monitoring system online"}
 
-
 @app.get("/health")
 def health():
     return {
@@ -60,6 +55,17 @@ def health():
         "version": "0.2.0"
     }
 
+
+@app.get("/db-test")
+def db_test(db: Session = Depends(get_db)):
+    try:
+        result = db.execute(text("SELECT 1"))
+        return {"database": "connected"}
+    except Exception as e:
+        return {
+            "database": "error",
+            "message": str(e)
+        }
 
 @app.post("/sensors", response_model=SensorOut)
 def create_sensor(sensor: SensorCreate, db: Session = Depends(get_db)):
