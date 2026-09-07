@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react"
 
 function App() {
+  const API_URL = "https://ev-energy-monitor.onrender.com"
   const [power, setPower] = useState(null)
   const [chargers, setChargers] = useState([])
 const [health, setHealth] = useState([])
 const [recommendation, setRecommendation] = useState(null)   
 useEffect(() => {
     const fetchData = () => {
-  fetch("http://127.0.0.1:8000/site/power")
+  fetch(`${API_URL}/site/power`)
     .then((response) => response.json())
     .then((data) => setPower(data))
 
-  fetch("http://127.0.0.1:8000/sensors")
+  fetch(`${API_URL}/sensors`)
     .then((response) => response.json())
     .then((data) => setChargers(data))
 
-  fetch("http://127.0.0.1:8000/site/health")
+  fetch(`${API_URL}/site/health`)
     .then((response) => response.json())
     .then((data) => setHealth(data.chargers))
-  fetch("http://127.0.0.1:8000/site/power/recommendation")
+  fetch(`${API_URL}/site/power/recommendation`)
     .then((response) => response.json())
     .then((data) => setRecommendation(data))
 

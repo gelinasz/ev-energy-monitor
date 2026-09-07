@@ -28,7 +28,7 @@ while True:
         }
 
         response = requests.post(
-            "http://127.0.0.1:8000/sensors",
+            "https://ev-energy-monitor.onrender.com/sensors",
             json=data
         )
 
