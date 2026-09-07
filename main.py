@@ -173,12 +173,17 @@ def get_power_recommendation(db: Session = Depends(get_db)):
     }
 @app.get("/site/health")
 def get_site_health(db: Session = Depends(get_db)):
-    chargers = db.query(SensorModel).all()
+    chargers = (
+        db.query(SensorModel)
+        .order_by(SensorModel.timestamp.desc())
+        .all()
+    )
 
     latest_readings = {}
 
     for charger in chargers:
-        latest_readings[charger.name] = charger
+        if charger.name not in latest_readings:
+            latest_readings[charger.name] = charger
 
     now = datetime.utcnow()
 
@@ -188,12 +193,12 @@ def get_site_health(db: Session = Depends(get_db)):
         age_seconds = (now - charger.timestamp).total_seconds()
 
         results.append({
-    "charger": charger.name,
-    "last_seen": charger.timestamp,
-    "age_seconds": round(age_seconds, 1),
-    "status": "stale" if age_seconds > STALE_THRESHOLD_SECONDS else "fresh",
-    "action": "check_connection" if age_seconds > STALE_THRESHOLD_SECONDS else "none"
-})
+            "charger": charger.name,
+            "last_seen": charger.timestamp,
+            "age_seconds": round(age_seconds, 1),
+            "status": "stale" if age_seconds > STALE_THRESHOLD_SECONDS else "fresh",
+            "action": "check_connection" if age_seconds > STALE_THRESHOLD_SECONDS else "none"
+        })
 
     return {
         "chargers": results
