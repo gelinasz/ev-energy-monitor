@@ -7,7 +7,13 @@ from sqlalchemy.orm import Session
 
 from datetime import datetime
 
-from database import get_db
+from database import get_db, Base, engine
+
+from models import Sensor as SensorModel
+
+Base.metadata.create_all(bind=engine)
+
+from fastapi.middleware.cors import CORSMiddleware
 from models import Sensor as SensorModel
 
 app = FastAPI()
